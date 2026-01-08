@@ -1,0 +1,23 @@
+# FastAPI and server
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Pydantic
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# HuggingFace
+huggingface-hub==0.20.2
+transformers==4.36.2
+
+# Vector operations
+numpy==1.26.3
+
+# Utilities
+python-dotenv==1.0.0
+
+# Optional: for local embeddings
+# sentence-transformers==2.2.2
+# torch==2.1.2
+
