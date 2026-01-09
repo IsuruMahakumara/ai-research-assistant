@@ -52,7 +52,7 @@ steps:
       - '--max-instances'
       - '10'
       - '--port'
-      - '8000'
+      - '$PORT'
       - '--set-secrets'
       - 'HUGGINGFACE_TOKEN=HUGGINGFACE_TOKEN:latest'
 
