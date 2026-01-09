@@ -1,0 +1,51 @@
+# Virtual environment
+venv/
+.venv/
+env/
+.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.cursor/
+
+# Git
+.git/
+.gitignore
+
+# Logs
+logs/
+*.log
+
+# Data and notebooks (not needed in container)
+data/
+notebooks/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
+
+# Documentation
+docs/
+*.md
+
+# Local environment files
+.env.local
+.env.development
+.env.test
+
