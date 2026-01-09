@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 
 
