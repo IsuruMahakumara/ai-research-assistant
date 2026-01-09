@@ -1,2 +1,0 @@
-# AI Research Assistant Backend
-
