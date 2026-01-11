@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 
 
@@ -9,14 +8,16 @@ class ChatRequest(BaseModel):
 
 
 class RetrievedDocument(BaseModel):
-    id: str
-    title: str
-    content: str
-    relevance_score: float
+    """Document retrieved from Pinecone vector store."""
+    id: str = Field(..., description="Document ID from Pinecone")
+    article_num: str = Field(..., description="Article number from the source document")
+    text: str = Field(..., description="Text content of the document")
+    score: float = Field(..., description="Relevance score from vector search")
 
 
 class ChatResponse(BaseModel):
-    query: str
-    answer: str
-    sources: list[RetrievedDocument]
+    """Response from the RAG agent."""
+    query: str = Field(..., description="Original user query")
+    answer: str = Field(..., description="Generated answer from LLM")
+    sources: list[RetrievedDocument] = Field(default_factory=list, description="Retrieved source documents")
 
