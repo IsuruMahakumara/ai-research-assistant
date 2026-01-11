@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from app.core.logger import setup_logging, get_logger, LOG_FILE
 from app.schemas.chat import ChatRequest, ChatResponse
 from app.llm import chat_model
+from app.retriever import PineconeRetriever
 
 setup_logging()
 logger = get_logger(__name__)
@@ -33,6 +34,17 @@ async def chat(request: ChatRequest) -> ChatResponse:
 @app.get("/")
 async def root():
     return {"status": "alive"}
+
+
+# Test endpoint for Pinecone retriever
+@app.get("/test-retriever")
+async def test_retriever(query: str = "What is the subject matter and objective of this regulation?"):
+    retriever = PineconeRetriever("llama-text-embed-v2-index-gdpr", "gdpr")
+    results = retriever.search(query, top_k=2, fields=["text", "article_num"])
+    return results
+
+
+
 
 if __name__ == "__main__":
     # Get port from environment, default to 8080

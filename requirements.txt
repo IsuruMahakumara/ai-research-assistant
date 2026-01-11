@@ -8,3 +8,6 @@ numpy>=1.26.3
 # AI Framework
 langchain-huggingface==1.2.0
 langchain-core==1.2.1
+
+# Vector Database
+pinecone
