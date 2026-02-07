@@ -1,6 +1,10 @@
 import os
+from pathlib import Path
 import uvicorn
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.logger import setup_logging, get_logger, LOG_FILE
 from app.schemas.chat import ChatRequest, ChatResponse
@@ -12,10 +16,22 @@ logger = get_logger(__name__)
 
 app = FastAPI(title="AI Research Assistant")
 
+# CORS middleware for development
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 logger.info(f"Log file location: {LOG_FILE.resolve()}")
 
 # Initialize the RAG agent at startup
 rag_agent = create_rag_agent()
+
+# Static files directory
+STATIC_DIR = Path(__file__).parent.parent / "static"
 
 
 @app.post("/chat", response_model=ChatResponse)
@@ -41,9 +57,10 @@ async def chat(request: ChatRequest) -> ChatResponse:
         logger.error(f"Error processing chat request: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 # Root endpoint for Cloud Run Health Checks
-@app.get("/")
-async def root():
+@app.get("/health")
+async def health():
     return {"status": "alive"}
 
 
@@ -55,6 +72,20 @@ async def test_retriever(query: str = "What is the subject matter and objective 
     return results
 
 
+# Mount static files if the directory exists (production)
+if STATIC_DIR.exists():
+    # Serve static assets (JS, CSS, images)
+    app.mount("/assets", StaticFiles(directory=STATIC_DIR / "assets"), name="assets")
+    
+    # Catch-all route for SPA - serve index.html for any unmatched routes
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        # Check if it's a static file request
+        static_file = STATIC_DIR / full_path
+        if static_file.exists() and static_file.is_file():
+            return FileResponse(static_file)
+        # Otherwise serve index.html for SPA routing
+        return FileResponse(STATIC_DIR / "index.html")
 
 
 if __name__ == "__main__":

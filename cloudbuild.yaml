@@ -54,7 +54,7 @@ steps:
       - '--port'
       - '$PORT'
       - '--set-secrets'
-      - 'HUGGINGFACE_TOKEN=HUGGINGFACE_TOKEN:latest'
+      - 'HUGGINGFACE_TOKEN=HUGGINGFACE_TOKEN:latest,PINECONE_API_KEY=PINECONE_API_KEY:latest'
 
 # Store images in Artifact Registry
 images:

@@ -1,15 +1,38 @@
-# AI Research Assistant Backend
+# AI Research Assistant
 
-A FastAPI-based backend service for an AI research assistant powered by HuggingFace models.
+A full-stack AI research assistant powered by HuggingFace models and Pinecone vector database. This is a monolith application with a FastAPI backend serving a React frontend.
+
+## Project Structure
+
+```
+├── app/                   # Python backend
+│   ├── agents/            # AI agents (RAG agent)
+│   ├── core/              # Core utilities (logging, config)
+│   ├── llm/               # LLM integrations (HuggingFace)
+│   ├── retriever/         # Document retrieval (Pinecone)
+│   ├── schemas/           # Pydantic models
+│   └── main.py            # FastAPI application
+├── frontend/              # React frontend
+│   ├── src/               # Source files
+│   ├── public/            # Static assets
+│   ├── package.json       # Node dependencies
+│   └── vite.config.ts     # Vite configuration
+├── static/                # Built frontend (generated)
+├── cloudbuild.yaml        # GCP Cloud Build config
+├── Dockerfile             # Multi-stage container build
+└── requirements.txt       # Python dependencies
+```
 
 ## Local Development
 
 ### Prerequisites
 
 - Python 3.12+
+- Node.js 20+
 - HuggingFace API token
+- Pinecone API key
 
-### Setup
+### Backend Setup
 
 ```bash
 # Create virtual environment
@@ -21,14 +44,40 @@ pip install -r requirements.txt
 
 # Set environment variables
 export HUGGINGFACE_TOKEN=your_token_here
+export PINECONE_API_KEY=your_pinecone_key_here
 
-# Run the server
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+# Run the backend server
+uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
 ```
+
+### Frontend Setup
+
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Run the dev server (proxies API requests to backend)
+npm run dev
+```
+
+The frontend dev server runs on http://localhost:5173 and proxies `/api/*` requests to the backend at http://localhost:8080.
+
+### Production Build
+
+```bash
+cd frontend
+npm run build
+```
+
+This builds the frontend and outputs to the `static/` directory, which FastAPI serves automatically.
 
 ## API Endpoints
 
-- `POST /chat` - Send a chat query and receive an AI-generated response
+- `POST /chat` - Send a query and receive an AI-generated response with source documents
+- `GET /health` - Health check endpoint
+- `GET /test-retriever` - Test the Pinecone retriever
 
 ## GCP Cloud Build Deployment
 
@@ -50,9 +99,13 @@ This project includes a `cloudbuild.yaml` for automated deployment to Google Clo
      --description="Docker images for Cloud Run"
    ```
 
-3. **Secret in Secret Manager** for HuggingFace token:
+3. **Secrets in Secret Manager**:
    ```bash
+   # HuggingFace token
    echo -n "your_huggingface_token" | gcloud secrets create HUGGINGFACE_TOKEN --data-file=-
+   
+   # Pinecone API key
+   echo -n "your_pinecone_api_key" | gcloud secrets create PINECONE_API_KEY --data-file=-
    ```
 
 4. **IAM Permissions** for Cloud Build service account:
@@ -95,7 +148,7 @@ Connect your repository to Cloud Build for automatic deployments on push:
 
 ```bash
 gcloud builds triggers create github \
-  --repo-name=ai-research-assistant-backend \
+  --repo-name=ai-research-assistant \
   --repo-owner=YOUR_GITHUB_USERNAME \
   --branch-pattern="^main$" \
   --build-config=cloudbuild.yaml
@@ -110,22 +163,3 @@ The Cloud Build configuration uses the following substitution variables (can be 
 | `_REGION` | `us-central1` | GCP region for deployment |
 | `_SERVICE_NAME` | `ai-research-assistant` | Cloud Run service name |
 | `_REPOSITORY` | `cloud-run-images` | Artifact Registry repository |
-
-## Project Structure
-
-```
-├── app/
-│   ├── agents/        # AI agents (future)
-│   ├── core/          # Core utilities (logging, config)
-│   ├── llm/           # LLM integrations (HuggingFace)
-│   ├── retriever/     # Document retrieval (future RAG)
-│   ├── schemas/       # Pydantic models
-│   └── main.py        # FastAPI application
-├── data/              # Data files
-├── logs/              # Application logs
-├── notebooks/         # Jupyter notebooks
-├── cloudbuild.yaml    # GCP Cloud Build config
-├── Dockerfile         # Container definition
-└── requirements.txt   # Python dependencies
-```
-
