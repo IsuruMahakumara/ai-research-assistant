@@ -49,3 +49,6 @@ docs/
 .env.development
 .env.test
 
+frontend/node_modules/
+frontend/.vite/
+static/
