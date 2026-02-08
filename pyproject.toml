@@ -1,0 +1,26 @@
+[project]
+name = "ai-research-assistant"
+version = "0.1.0"
+description = "AI Research Assistant"
+requires-python = ">=3.12"
+dependencies = [
+    # Web Framework
+    "fastapi>=0.115.0",
+    "uvicorn==0.27.0",
+    "pydantic-settings>=2.1.0",
+    "python-dotenv==1.0.0",
+    "numpy>=1.26.3",
+    # AI Framework
+    "langchain-huggingface==1.2.0",
+    "langchain-core==1.2.1",
+    # Vector Database
+    "pinecone",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
